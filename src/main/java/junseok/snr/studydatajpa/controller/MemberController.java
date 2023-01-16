@@ -41,7 +41,7 @@ public class MemberController {
                 .map(MemberDto::new);
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         for (int i = 0; i < 100; i++) {
             final Team team = new Team("team" + i);
