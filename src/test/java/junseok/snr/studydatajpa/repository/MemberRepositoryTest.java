@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -162,5 +163,25 @@ class MemberRepositoryTest {
         assertThat(members.get(0).getUserName()).isEqualTo("AAA");
         assertThat(members.get(1).getUserName()).isEqualTo("BBB");
     }
+
+    @Test
+    void testReturnType() {
+        final Member member1 = new Member("AAA", 10);
+        final Member member2 = new Member("BBB", 20);
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        final List<Member> members = memberRepository.findListByUserName("AAA");
+        final Member member = memberRepository.findMemberByUserName("AAA");
+        final Optional<Member> memberOptional = memberRepository.findOptionalMemberByUserName("AAA");
+
+        assertThat(members).hasSize(1);
+        assertThat(members.get(0)).isEqualTo(member1);
+        assertThat(member).isEqualTo(member1);
+        assertThat(memberOptional.get()).isEqualTo(member1);
+
+    }
+
 
 }
