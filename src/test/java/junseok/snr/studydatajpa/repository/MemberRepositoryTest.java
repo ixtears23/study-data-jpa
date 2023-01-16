@@ -29,6 +29,7 @@ class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
     @PersistenceContext EntityManager entityManager;
+    @Autowired MemberQueryRepository memberQueryRepository;
 
     @Test
     void testMember() {
@@ -289,4 +290,20 @@ class MemberRepositoryTest {
 
         final List<Member> member = memberRepository.findLockByUserName("member1");
     }
+
+    @Test
+    void callCustom() {
+        final List<Member> result = memberRepository.findMemberCustom();
+    }
+
+    @Test
+    void findAll() {
+        final Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+
+        final List<Member> allMembers = memberQueryRepository.findAllMembers();
+
+        assertThat(allMembers).hasSize(1);
+    }
+
 }
