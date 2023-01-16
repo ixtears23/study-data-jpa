@@ -306,4 +306,55 @@ class MemberRepositoryTest {
         assertThat(allMembers).hasSize(1);
     }
 
+    @Test
+    void queryByExample() {
+        final Team teamA = new Team("teamA");
+        entityManager.persist(teamA);
+
+        final Member m1 = new Member("m1", 0, teamA);
+        final Member m2 = new Member("m2", 0, teamA);
+        entityManager.persist(m1);
+        entityManager.persist(m2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Member member = new Member("m1");
+        final Team teamA1 = new Team("teamA");
+        member.setTeam(teamA1);
+
+        final ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withIgnorePaths("age");
+
+        final Example<Member> memberExample = Example.of(member, exampleMatcher);
+        final List<Member> result = memberRepository.findAll(memberExample);
+
+        assertThat(result.get(0).getUserName()).isEqualTo("m1");
+
+    }
+
+    @Test
+    void projection() {
+        final Team teamA = new Team("teamA");
+        entityManager.persist(teamA);
+
+        final Member m1 = new Member("m1", 0, teamA);
+        final Member m2 = new Member("m2", 0, teamA);
+        entityManager.persist(m1);
+        entityManager.persist(m2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        final List<NestedClosedProjections> result = memberRepository.findProjectionByUserName("m1", NestedClosedProjections.class);
+
+        for (NestedClosedProjections nestedClosedProjections: result) {
+            final String userName = nestedClosedProjections.getUserName();
+            System.out.println("userName : " + userName);
+            final String teamName = nestedClosedProjections.getTeam().getName();
+            System.out.println("teamName : " + teamName);
+        }
+
+    }
+
 }
