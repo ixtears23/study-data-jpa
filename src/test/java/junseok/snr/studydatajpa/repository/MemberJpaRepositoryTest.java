@@ -85,4 +85,26 @@ class MemberJpaRepositoryTest {
         assertThat(member).isEqualTo(m1);
     }
 
+    @Test
+    void testFindByPage() {
+        final Member m1 = new Member("AAA", 10);
+        final Member m2 = new Member("BBB", 10);
+        memberJpaRepository.save(m1);
+        memberJpaRepository.save(m2);
+
+        final List<Member> members = memberJpaRepository.findByPage(10, 0, 2);
+        assertThat(members).hasSize(2);
+    }
+
+    @Test
+    void testTotalCount() {
+        final Member m1 = new Member("AAA", 10);
+        final Member m2 = new Member("BBB", 10);
+        memberJpaRepository.save(m1);
+        memberJpaRepository.save(m2);
+
+        final long count = memberJpaRepository.totalCount(10);
+        assertThat(count).isEqualTo(2);
+    }
+
 }

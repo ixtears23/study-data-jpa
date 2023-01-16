@@ -6,10 +6,12 @@ import junseok.snr.studydatajpa.entity.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -183,5 +185,38 @@ class MemberRepositoryTest {
 
     }
 
+    @Test
+    void paging() {
+
+        final List<String> userNames = Arrays.asList("member1", "member2", "member3", "member4", "member5", "member6", "member7", "member8", "member9", "member10");
+
+        memberRepository.save(new Member(userNames.get(0), 10));
+        memberRepository.save(new Member(userNames.get(1), 10));
+        memberRepository.save(new Member(userNames.get(2), 10));
+        memberRepository.save(new Member(userNames.get(3), 10));
+        memberRepository.save(new Member(userNames.get(4), 10));
+        memberRepository.save(new Member(userNames.get(5), 10));
+        memberRepository.save(new Member(userNames.get(6), 10));
+        memberRepository.save(new Member(userNames.get(7), 10));
+        memberRepository.save(new Member(userNames.get(8), 10));
+        memberRepository.save(new Member(userNames.get(9), 10));
+
+        final int age = 10;
+        final Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "userName"));
+
+        final Page<Member> page = memberRepository.findByAge(age, pageable);
+
+        final Page<MemberDto> memberDtos = page.map(member -> new MemberDto(member.getId(), member.getUserName(), null));
+
+
+        final List<Member> members = page.getContent();
+        final long totalElements = page.getTotalElements();
+
+        assertThat(members).hasSize(3);
+        assertThat(totalElements).isEqualTo(10);
+        assertThat(page.getNumber()).isZero();
+        assertThat(page.getTotalPages()).isEqualTo(4);
+        assertThat(page.isFirst()).isTrue();
+    }
 
 }
