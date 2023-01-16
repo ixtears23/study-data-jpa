@@ -1,6 +1,8 @@
 package junseok.snr.studydatajpa.repository;
 
+import junseok.snr.studydatajpa.dto.MemberDto;
 import junseok.snr.studydatajpa.entity.Member;
+import junseok.snr.studydatajpa.entity.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
+    @Autowired TeamRepository teamRepository;
 
     @Test
     void testMember() {
@@ -100,6 +103,46 @@ class MemberRepositoryTest {
         final Member member = members.get(0);
         assertThat(member).isEqualTo(m1);
     }
+
+    @Test
+    void testFindUserName() {
+
+        final Member member1 = new Member("AAA", 10);
+        final Member member2 = new Member("BBB", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        final List<String> userNameList = memberRepository.findUserNameList();
+
+        assertThat(userNameList).hasSize(2);
+    }
+
+    @Test
+    void testFindMemberDto() {
+
+        final Member member1 = new Member("AAA", 10);
+        final Member member2 = new Member("BBB", 20);
+        final Team team = new Team("A팀");
+
+        teamRepository.save(team);
+        member1.setTeam(team);
+        member2.setTeam(team);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        final List<MemberDto> memberDto = memberRepository.findMemberDto();
+
+        assertThat(memberDto).hasSize(2);
+        final MemberDto memberDto1 = memberDto.get(0);
+        final MemberDto memberDto2 = memberDto.get(1);
+        assertThat(memberDto1.getUserName()).isEqualTo("AAA");
+        assertThat(memberDto1.getTeamName()).isEqualTo("A팀");
+
+        assertThat(memberDto2.getUserName()).isEqualTo("BBB");
+        assertThat(memberDto2.getTeamName()).isEqualTo("A팀");
+
+    }
+
 
 
 }
