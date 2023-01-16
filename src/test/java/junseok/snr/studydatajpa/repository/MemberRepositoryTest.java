@@ -9,7 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -140,9 +143,24 @@ class MemberRepositoryTest {
 
         assertThat(memberDto2.getUserName()).isEqualTo("BBB");
         assertThat(memberDto2.getTeamName()).isEqualTo("A팀");
-
     }
 
+    @Test
+    void testFindByNames() {
+        final Member member1 = new Member("AAA", 10);
+        final Member member2 = new Member("BBB", 20);
 
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        final List<String> memberNames = Stream.of("AAA", "BBB")
+                .collect(Collectors.toList());
+
+        final List<Member> members = memberRepository.findByNames(memberNames);
+
+        assertThat(members).hasSize(2);
+        assertThat(members.get(0).getUserName()).isEqualTo("AAA");
+        assertThat(members.get(1).getUserName()).isEqualTo("BBB");
+    }
 
 }
