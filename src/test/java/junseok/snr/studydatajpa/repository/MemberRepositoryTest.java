@@ -241,4 +241,52 @@ class MemberRepositoryTest {
         assertThat(resultCount).isEqualTo(3);
     }
 
+    @Test
+    void findMemberLazy() {
+
+        final Team teamA = new Team("teamA");
+        final Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        final Member member1 = new Member("member1", 10, teamA);
+        final Member member2 = new Member("member1", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+
+        final List<Member> members = memberRepository.findEntityGraphByUserName("member1");
+
+        for (Member member : members) {
+            System.out.println("member = " + member);
+            System.out.println("member = " + member.getTeam().getClass());
+            System.out.println("team = " + member.getTeam().getName());
+        }
+    }
+
+    @Test
+    void queryHint() {
+        final Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        entityManager.flush();
+        entityManager.clear();
+
+        final Member member = memberRepository.findReadOnlyByUserName("member1");
+        member.setUserName("member2");
+
+        entityManager.flush();
+    }
+
+    @Test
+    void lock() {
+        final Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        entityManager.flush();
+        entityManager.clear();
+
+        final List<Member> member = memberRepository.findLockByUserName("member1");
+    }
 }
