@@ -69,4 +69,14 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
     List<Member> findLockByUserName(String userName);
 
     <T> List<T> findProjectionByUserName(@Param("userName") String userName, Class<T> type);
+
+    @Query(value = "select * from MEMBER where USER_NAME = ?", nativeQuery = true)
+    Member findByNativeQuery(String userName);
+
+    @Query(value = "select m.member_id as id, m.user_name as userName, t.name as teamName " +
+            "from member m left join team t",
+            countQuery = "select count(*) from member",
+            nativeQuery = true
+    )
+    Page<MemberProjection> findByNativeProjection(Pageable pageable);
 }
